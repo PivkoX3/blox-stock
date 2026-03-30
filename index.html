@@ -6,49 +6,47 @@
     <title>Flare Live Stock</title>
     <style>
         body { 
-            background: #2b2d31; color: #dbdee1; font-family: sans-serif; 
+            background: #2b2d31; color: #dbdee1; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; 
             margin: 0; padding: 15px; display: flex; justify-content: center;
         }
         .discord-embed {
             background: #232428; border-left: 4px solid #f0b232; border-radius: 4px;
             padding: 12px 16px; width: 100%; max-width: 340px; box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
-        .bot-name { font-weight: bold; color: white; margin-bottom: 8px; font-size: 1rem; display: flex; align-items: center; }
-        .bot-name::after { content: "✔ BOT"; background: #5865f2; color: white; font-size: 0.6rem; padding: 2px 4px; border-radius: 3px; margin-left: 8px; }
+        .bot-header { display: flex; align-items: center; margin-bottom: 8px; }
+        .bot-name { font-weight: bold; color: white; font-size: 0.95rem; }
+        .bot-tag { 
+            background: #5865f2; color: white; font-size: 0.6rem; 
+            padding: 1px 4px; border-radius: 3px; margin-left: 8px; font-weight: bold; 
+        }
+        .title { color: white; font-weight: bold; font-size: 1.1rem; margin-bottom: 12px; display: block; }
+        .section-title { font-weight: bold; color: white; font-size: 0.85rem; margin-top: 16px; margin-bottom: 8px; text-transform: uppercase; }
         
-        .title { color: white; font-weight: bold; font-size: 1.1rem; margin-bottom: 12px; }
-        .section-title { font-weight: bold; color: white; font-size: 0.9rem; margin-top: 15px; text-transform: uppercase; }
-        
-        .fruit-row { display: flex; align-items: center; margin: 4px 0; font-size: 0.95rem; }
-        .fruit-icon { margin-right: 8px; width: 20px; text-align: center; }
-        .fruit-name { color: #dbdee1; }
-        .price { color: #3ba55c; font-weight: bold; margin-left: auto; font-family: monospace; }
+        .fruit-row { display: flex; justify-content: space-between; margin: 6px 0; font-size: 0.95rem; line-height: 1.4; border-bottom: 1px solid #2e2f35; padding-bottom: 4px; }
+        .price { color: #3ba55c; font-weight: bold; }
 
         .footer { color: #949ba4; font-size: 0.75rem; margin-top: 20px; border-top: 1px solid #3f4147; padding-top: 10px; }
+        .update-time { font-style: italic; font-size: 0.65rem; color: #72767d; }
     </style>
 </head>
 <body>
 
     <div class="discord-embed">
-        <div class="bot-name">Flare</div>
-        <div class="title">Flare • Live Stock Bot</div>
+        <div class="bot-header">
+            <span class="bot-name">Flare</span>
+            <span class="bot-tag">✔ BOT</span>
+        </div>
+        <span class="title">Flare • Live Stock Bot</span>
 
         <div class="section-title">NORMAL STOCK</div>
         <div id="normal-stock">
-            <div class="fruit-row"><span class="fruit-icon">⚙️</span><span class="fruit-name">Rocket</span><span class="price">5000 $</span></div>
-            <div class="fruit-row"><span class="fruit-icon">🔄</span><span class="fruit-name">Spin</span><span class="price">7500 $</span></div>
-            <div class="fruit-row"><span class="fruit-icon">💣</span><span class="fruit-name">Bomb</span><span class="price">80000 $</span></div>
-            <div class="fruit-row"><span class="fruit-icon">💎</span><span class="fruit-name">Diamond</span><span class="price">600000 $</span></div>
-        </div>
+            <div class="fruit-row"><span>Ожидание первого запуска...</span><span class="price">0 $</span></div>
+            </div>
 
-        <div class="section-title">MIRAGE STOCK</div>
-        <div id="mirage-stock">
-            <div class="fruit-row"><span class="fruit-icon">❄️</span><span class="fruit-name">Ice</span><span class="price">350000 $</span></div>
-            <div class="fruit-row"><span class="fruit-icon">🦖</span><span class="fruit-name">T-Rex</span><span class="price">2700000 $</span></div>
-            <div class="fruit-row"><span class="fruit-icon">🐍</span><span class="fruit-name">Venom</span><span class="price">3000000 $</span></div>
+        <div class="footer">
+            Expires in every two hours.<br>
+            <span class="update-time">Last update: auto-refresh active</span>
         </div>
-        
-        <div class="footer">Expires in every two hours.</div>
     </div>
 
 </body>
