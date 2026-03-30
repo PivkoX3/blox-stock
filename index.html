@@ -6,62 +6,58 @@
     <title>Blox Fruits Stock</title>
     <style>
         :root { --bg: #0f172a; --card: #1e293b; --accent: #38bdf8; --text: #f8fafc; --price: #4caf50; }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
-        h1 { font-size: 1.2rem; margin-bottom: 15px; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; }
-        
+        body { background: var(--bg); color: var(--text); font-family: sans-serif; margin: 0; padding: 15px; display: flex; flex-direction: column; align-items: center; }
+        h1 { font-size: 1.2rem; color: var(--accent); text-transform: uppercase; margin-bottom: 20px; }
         #stock-list { width: 100%; max-width: 350px; }
         .fruit-card { 
             background: var(--card); border: 1px solid #334155; border-radius: 12px; 
             padding: 12px 16px; margin-bottom: 8px; display: flex; 
             justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
-        .name { font-weight: 700; color: var(--text); }
-        .price { color: var(--price); font-weight: 600; font-family: monospace; }
-        
-        .loader { text-align: center; margin-top: 50px; color: #94a3b8; font-size: 0.9rem; }
-        .refresh-btn { 
-            margin-top: 15px; background: var(--accent); color: var(--bg); 
-            border: none; padding: 8px 20px; border-radius: 20px; 
-            font-weight: bold; cursor: pointer; font-size: 0.8rem;
-        }
-        .error-msg { font-size: 0.8rem; color: #ef4444; margin-top: 20px; padding: 10px; }
+        .name { font-weight: bold; }
+        .price { color: var(--price); font-family: monospace; }
+        .loader { text-align: center; margin-top: 50px; color: #94a3b8; }
+        .btn { margin-top: 20px; background: var(--accent); color: var(--bg); border: none; padding: 10px 25px; border-radius: 20px; font-weight: bold; cursor: pointer; }
     </style>
 </head>
 <body>
 
-    <h1>🍎 Fruit Stock</h1>
-    
-    <div id="stock-list">
-        <div class="loader">Получение данных из Second Sea...</div>
-    </div>
-
-    <button class="refresh-btn" onclick="fetchData()">ОБНОВИТЬ 🔄</button>
+    <h1>🍎 ТЕКУЩИЙ СТОК</h1>
+    <div id="stock-list"><div class="loader">Загрузка данных...</div></div>
+    <button class="btn" onclick="loadStock()">ОБНОВИТЬ 🔄</button>
 
     <script>
-        async function fetchData() {
-            const container = document.getElementById('stock-list');
-            container.innerHTML = '<div class="loader">Сканирую сток...</div>';
-            
+        async function loadStock() {
+            const list = document.getElementById('stock-list');
+            list.innerHTML = '<div class="loader">Считываю фрукты...</div>';
             const proxy = "https://corsproxy.io/?";
-            const target = "https://fruityblox.com/stock";
+            const url = "https://fruityblox.com/stock";
             
             try {
-                const response = await fetch(proxy + encodeURIComponent(target));
+                const response = await fetch(proxy + encodeURIComponent(url));
                 const html = await response.text();
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, "text/html");
 
-                // Пытаемся найти элементы стока (используем разные селекторы для надежности)
+                // Ищем любые элементы, похожие на карточки фруктов
                 const items = doc.querySelectorAll('.stock-item, [class*="StockItem"], [class*="FruitItem"]');
-                let resultHTML = "";
+                let content = "";
 
-                if (items && items.length > 0) {
+                if (items.length > 0) {
                     items.forEach(item => {
-                        const name = item.querySelector('h3, .name, [class*="Name"]')?.innerText.trim() || "Неизвестный фрукт";
+                        const name = item.querySelector('h3, .name, [class*="Name"]')?.innerText.trim() || "Фрукт";
                         const price = item.querySelector('.price, [class*="Price"]')?.innerText.trim() || "В наличии";
-                        
-                        resultHTML += `
-                            <div class="fruit-card">
-                                <span class="name">${name}</span>
-                                <span class="price">${price}
+                        content += `<div class="fruit-card"><span class="name">${name}</span><span class="price">${price}</span></div>`;
+                    });
+                    list.innerHTML = content;
+                } else {
+                    list.innerHTML = '<p style="font-size:0.8rem; color:#ef4444">Сайт изменил структуру. Попробуйте обновить позже или <a href="https://fruityblox.com/stock" style="color:var(--accent)">откройте оригинал</a></p>';
+                }
+            } catch (e) {
+                list.innerHTML = '<p>Ошибка сети</p>';
+            }
+        }
+        loadStock();
+    </script>
+</body>
+</html>
