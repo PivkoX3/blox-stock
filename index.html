@@ -5,46 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Blox Fruit Stock</title>
     <style>
-        body { background: #0f172a; color: white; font-family: sans-serif; text-align: center; padding: 15px; }
-        .card { background: #1e293b; border: 2px solid #38bdf8; border-radius: 15px; padding: 15px; margin: 10px auto; max-width: 280px; }
-        .fruit-name { font-size: 1.4em; font-weight: bold; color: #38bdf8; }
-        .price { color: #4caf50; font-size: 1.1em; margin-top: 5px; }
-        .loader { color: #94a3b8; margin-top: 50px; }
+        body { background: #111827; color: white; font-family: sans-serif; text-align: center; padding: 10px; margin: 0; }
+        .header { background: #1f2937; padding: 15px; border-bottom: 2px solid #3b82f6; margin-bottom: 15px; }
+        .fruit-card { background: #1e293b; border-radius: 12px; padding: 12px; margin: 8px auto; max-width: 90%; border-left: 5px solid #3b82f6; display: flex; justify-content: space-between; align-items: center; }
+        .name { font-weight: bold; font-size: 1.1em; color: #60a5fa; }
+        .price { color: #10b981; font-family: monospace; }
+        .loader { margin-top: 50px; color: #94a3b8; }
+        .refresh-note { font-size: 0.8em; color: #64748b; margin-top: 15px; }
     </style>
 </head>
 <body>
-    <h1>🍎 Чистый Сток</h1>
-    <div id="content"><p class="loader">Считываю фрукты без рекламы...</p></div>
+    <div class="header">
+        <strong>🍎 ТЕКУЩИЙ СТОК</strong>
+    </div>
+    
+    <div id="stock-container">
+        <p class="loader">Убираю рекламу и загружаю фрукты...</p>
+    </div>
+
+    <p class="refresh-note">Обновляется автоматически каждые 4 часа</p>
 
     <script>
-        async function loadStock() {
+        async function getStock() {
             const proxy = "https://corsproxy.io/?";
             const target = "https://fruityblox.com/stock";
             try {
                 const response = await fetch(proxy + encodeURIComponent(target));
-                const html = await response.text();
+                const text = await response.text();
                 const parser = new DOMParser();
-                const doc = parser.parseFromString(html, "text/html");
+                const doc = parser.parseFromString(text, "text/html");
 
-                // Пытаемся найти элементы фруктов на сайте
-                const items = doc.querySelectorAll('.stock-item, [class*="StockItem"]');
-                let output = "";
+                // Ищем все элементы с фруктами
+                const items = doc.querySelectorAll('.stock-item');
+                let html = "";
 
                 if (items.length > 0) {
                     items.forEach(item => {
-                        const name = item.querySelector('h3, .name, [class*="Name"]')?.innerText || "Фрукт";
-                        const price = item.querySelector('.price, [class*="Price"]')?.innerText || "Цена в игре";
-                        output += `<div class="card"><div class="fruit-name">${name}</div><div class="price">${price}</div></div>`;
+                        const name = item.querySelector('.name')?.innerText || "Фрукт";
+                        const price = item.querySelector('.price')?.innerText || "---";
+                        html += `<div class="fruit-card"><span class="name">${name}</span><span class="price">${price}</span></div>`;
                     });
                 } else {
-                    output = "<p>Не удалось вытянуть данные автоматически. <br><br> <a href='https://fruityblox.com/stock' style='color:#38bdf8'>Посмотреть оригинал</a></p>";
+                    html = "<p>Сток пуст или сайт изменил защиту. <br><br> <a href='https://fruityblox.com/stock' style='color:#3b82f6'>Оригинал</a></p>";
                 }
-                document.getElementById('content').innerHTML = output;
+                document.getElementById('stock-container').innerHTML = html;
             } catch (e) {
-                document.getElementById('content').innerHTML = "Ошибка связи с сервером.";
+                document.getElementById('stock-container').innerHTML = "Ошибка загрузки данных.";
             }
         }
-        loadStock();
+        getStock();
     </script>
 </body>
 </html>
