@@ -1,0 +1,59 @@
+name: Auto Update Blox Fruit Stock
+on:
+  schedule:
+    - cron: '0 */2 * * *' # Запуск каждые 2 часа
+  workflow_dispatch:      # Кнопка для ручного запуска
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: pip install requests beautifulsoup4
+
+      - name: Run Scraper
+        run: |
+          python << END
+          import requests
+          from bs4 import BeautifulSoup
+
+          # Парсим сайт
+          res = requests.get('https://fruityblox.com/stock')
+          soup = BeautifulSoup(res.text, 'html.parser')
+          items = soup.select('.stock-item') # Базовый селектор сайта
+
+          stock_data = ""
+          for item in items[:6]: # Берем первые 6 фруктов
+              name = item.select_one('h3').text.strip()
+              price = item.select_one('.price').text.strip()
+              stock_data += f'<div class="fruit-row"><span>{name}</span><span class="price">{price}</span></div>\n'
+
+          # Читаем шаблон и заменяем данные
+          with open('index.html', 'r', encoding='utf-8') as f:
+              content = f.read()
+
+          # Находим блок NORMAL STOCK и меняем содержимое
+          import re
+          new_content = re.sub(r'(.*?)', 
+                               f'\n{stock_data}', 
+                               content, flags=re.DOTALL)
+
+          with open('index.html', 'w', encoding='utf-8') as f:
+              f.write(new_content)
+          END
+
+      - name: Push Changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add index.html
+          git commit -m "Auto-update stock: $(date)" || exit 0
+          git push
