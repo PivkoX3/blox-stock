@@ -3,23 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Blox Fruits Stock</title>
+    <title>Blox Fruit Stock</title>
     <style>
-        body { background: #0f172a; color: white; font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; }
-        .container { background: #1e293b; border-radius: 20px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
-        h1 { color: #38bdf8; font-size: 24px; }
-        .btn { display: inline-block; background: #0284c7; color: white; padding: 15px 25px; border-radius: 12px; text-decoration: none; font-weight: bold; margin-top: 20px; }
-        .loader { color: #94a3b8; font-style: italic; }
+        body { background: #0f172a; color: white; font-family: sans-serif; text-align: center; padding: 15px; }
+        .card { background: #1e293b; border: 2px solid #38bdf8; border-radius: 15px; padding: 15px; margin: 10px auto; max-width: 280px; }
+        .fruit-name { font-size: 1.4em; font-weight: bold; color: #38bdf8; }
+        .price { color: #4caf50; font-size: 1.1em; margin-top: 5px; }
+        .loader { color: #94a3b8; margin-top: 50px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🍎 Blox Fruits Stock</h1>
-        <p>Нажми на кнопку ниже, чтобы открыть актуальный сток и таймер без рекламы:</p>
-        
-        <a href="https://fruityblox.com/stock" class="btn">ОТКРЫТЬ СТОК 🚀</a>
-        
-        <p style="margin-top: 20px; font-size: 12px; color: #64748b;">Данные обновляются автоматически с сайта FruityBlox</p>
-    </div>
+    <h1>🍎 Чистый Сток</h1>
+    <div id="content"><p class="loader">Считываю фрукты без рекламы...</p></div>
+
+    <script>
+        async function loadStock() {
+            const proxy = "https://corsproxy.io/?";
+            const target = "https://fruityblox.com/stock";
+            try {
+                const response = await fetch(proxy + encodeURIComponent(target));
+                const html = await response.text();
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, "text/html");
+
+                // Пытаемся найти элементы фруктов на сайте
+                const items = doc.querySelectorAll('.stock-item, [class*="StockItem"]');
+                let output = "";
+
+                if (items.length > 0) {
+                    items.forEach(item => {
+                        const name = item.querySelector('h3, .name, [class*="Name"]')?.innerText || "Фрукт";
+                        const price = item.querySelector('.price, [class*="Price"]')?.innerText || "Цена в игре";
+                        output += `<div class="card"><div class="fruit-name">${name}</div><div class="price">${price}</div></div>`;
+                    });
+                } else {
+                    output = "<p>Не удалось вытянуть данные автоматически. <br><br> <a href='https://fruityblox.com/stock' style='color:#38bdf8'>Посмотреть оригинал</a></p>";
+                }
+                document.getElementById('content').innerHTML = output;
+            } catch (e) {
+                document.getElementById('content').innerHTML = "Ошибка связи с сервером.";
+            }
+        }
+        loadStock();
+    </script>
 </body>
 </html>
